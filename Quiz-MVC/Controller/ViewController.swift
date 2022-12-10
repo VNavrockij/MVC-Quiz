@@ -18,7 +18,7 @@ class ViewController: UIViewController, CAAnimationDelegate {
     
     @IBOutlet weak var progressBar: UIProgressView!
     
-    
+    var quizBrain = QuizBrain()
     
     let gradient: CAGradientLayer = CAGradientLayer()
     let colors: Colors = Colors()
@@ -30,17 +30,59 @@ class ViewController: UIViewController, CAAnimationDelegate {
 
         setupGradient()
         animateGradient()
+        
+        setButtonBorders()
     }
     
     
     override func viewDidLoad() {
-
         super.viewDidLoad()
-        print("hello")
+        updateUI()
+    }
+    
+    @IBAction func answerButtonPressed(_ sender: UIButton) {
+        if quizBrain.checkAnswer(sender.currentTitle!) {
+            sender.backgroundColor = .green.withAlphaComponent(0.5)
+            sender.layer.cornerRadius = 25
+        } else {
+            sender.backgroundColor = .red.withAlphaComponent(0.5)
+            sender.layer.cornerRadius = 25
+        }
+        
+        quizBrain.nextQuestion()
+//        quizBrain.randomQuestion()
+        
+        Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(updateUI), userInfo: nil, repeats: false)
+    }
+    
+    @objc func updateUI() {
+        questionLabel.text = quizBrain.getQuestionText()
+        progressBar.progress = quizBrain.getProgress()
         
         
-
-//        print("Hello, MVC!")
+        firstButton.setTitle(quizBrain.quiz[quizBrain.retQuestNumb()].varAnswers[0], for: .normal)
+        secondButton.setTitle(quizBrain.quiz[quizBrain.retQuestNumb()].varAnswers[1], for: .normal)
+        thirdButton.setTitle(quizBrain.quiz[quizBrain.retQuestNumb()].varAnswers[2], for: .normal)
+        
+        scoreLabel.text = "Score: \(quizBrain.getScore())"
+        
+        secondButton.backgroundColor = .clear
+        firstButton.backgroundColor = .clear
+        thirdButton.backgroundColor = .clear
+    }
+    
+    func setButtonBorders() {
+        firstButton.layer.borderWidth = 0.7
+        firstButton.layer.cornerRadius = 25
+        firstButton.layer.borderColor = .init(gray: 0.1, alpha: 0.1)
+        
+        secondButton.layer.borderWidth = 0.7
+        secondButton.layer.cornerRadius = 25
+        secondButton.layer.borderColor = .init(gray: 0.1, alpha: 0.1)
+        
+        thirdButton.layer.borderWidth = 0.7
+        thirdButton.layer.cornerRadius = 25
+        thirdButton.layer.borderColor = .init(gray: 0.1, alpha: 0.1)
     }
     
     func animationDidStop(_ anim: CAAnimation, finished flag: Bool) {
@@ -87,5 +129,7 @@ class ViewController: UIViewController, CAAnimationDelegate {
             colorIndex = 0
         }
     }
+    
+    
 }
 
